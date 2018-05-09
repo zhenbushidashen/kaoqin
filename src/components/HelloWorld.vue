@@ -36,8 +36,8 @@
     <el-table-column
       label="操作">
       <template slot-scope="scope">
-     <a href="#">考勤数据</a>
-        <a href="#">修改</a>
+     <router-link to="/dataview">考勤数据</router-link>
+     <router-link to="/modify">修改</router-link>
         <a href="#"> 禁用</a>
         <a href="#"> 启用</a>
         <a href="#">删除</a>
