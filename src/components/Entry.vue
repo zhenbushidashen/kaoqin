@@ -31,7 +31,11 @@
     <el-table-column
       prop="status"
       label="状态"
-      :formatter="formatter">
+     >
+      <template slot-scope="scope">
+        <span>{{scope.row.status ? '禁用' : '启用'}}</span>
+
+      </template>
     </el-table-column>
     <el-table-column
       label="操作">
@@ -43,6 +47,7 @@
       </template>
     </el-table-column>
   </el-table>
+  {{$store.state.attendanceItems}}
   </div>
 </template>
 
@@ -62,9 +67,6 @@ export default {
       } 
     },
     methods: {
-      formatter(row, column) {
-        return row.status ? '启用' :'禁用';
-      },
       create () {
         this.$router.push('/create')
       },
@@ -88,10 +90,12 @@ export default {
       enableDisableItem (status, id) {
         if(status) {
           store.dispatch('CLOSE_ATTENDANCEITEM',id).then(res => {
+            store.commit('UPDATE_ATTENDANCEITEM', {locationId: id, key: 'status', value: false})
             this.$message.success('禁用成功')
           })
         } else {
           store.dispatch('OPEN_ATTENDANCEITEM', id).then(res => {
+            store.commit('UPDATE_ATTENDANCEITEM', {locationId: id, key: 'status', value: true})
             this.$message.success('开启成功')
           })
         }
