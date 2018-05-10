@@ -5,7 +5,7 @@
 <label for="">考勤部门</label> 
  <el-input
   placeholder="请输入内容"
-  v-model="place"
+  v-model="oName"
   clearable
   style="width:50%;">
 </el-input>
@@ -46,7 +46,7 @@
   <br>
   <br>
   <el-button @click="$router.push('/')">取消返回</el-button>
-  <el-button type="primary">立即创建</el-button>
+  <el-button type="primary" @click="confirmChange">立即创建</el-button>
   <el-dialog title="选择办公地点" :visible.sync="dialogTableVisible">
     <BMap></BMap>
     <el-button @click="dialogTableVisible=false">取消</el-button>
@@ -61,7 +61,7 @@
   node-key="id"
   ref="tree"
   highlight-current
-  :props="defaultProps">
+  >
 </el-tree>
     <el-button @click="contactTableVisible=false">取消</el-button>
     <el-button type="primary">确定</el-button>
@@ -121,6 +121,27 @@ export default {
           }]
         }]
       }
+  },
+  methods: {
+    confirmChange() {
+      if(!this.$data.place) {
+        this.$message.error('请选择办公地点')
+        return 
+      }
+      if(!this.$data.signIn) {
+        this.$message.error('请选择上班时间')
+        return 
+      }
+      if(!this.$data.signOut) {
+        this.$message.error('请选择下班时间')
+        return 
+      }
+       if(!this.$data.radius) {
+        this.$message.error('请选择打卡范围')
+        return 
+      }
+
+    }
   }
 }
 </script>
