@@ -20,49 +20,7 @@ npm run build --report
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
-1、前端接口
-	1.1 获取用户签到点
-		GET /location
-		参数param
-			?ticket&latitude&longitude
-		Header ticket
-		返回body
-			{oId, place, signIn,signOut,id ,distance}
-	1.2 创建签到记录
-		注释：place:外出签到是地点，正常签到是签到点
-		POST /record
-		参数body
-			{place,result,note,shift,latitude,longitude,photo}
-		Header ticket
-		返回body
-			{id,place,time,result,note,shift,latitude,longitude,photo}
-	1.3 修改签到记录
-		PUT	/record/{id}
-		参数body
-			{note,photo}
-		Header ticket
-		返回body
-			{id,place,time,result,note,shift,latitude,longitude,photo}
-	1.4 按天获取签到记录结果
-		GET /record
-		参数param
-			?ticket&time
-		Header ticket
-		返回body
-			{place,time,result,shift,id}
-	1.5 获取签到记录详情
-		GET /record/{id}
-		Header ticket
-		返回body
-			{place,time,result,shift,id,latitude,longitude,note,photo,eId}
-	1.5 获取签到记录结果
-		GET /record/stats
-		Header ticket
-		参数param
-			?begin&end
-		返回body
-			{date,result}
-	
+
 2、后端接口
 	2.1 创建签到点
 		POST /location
@@ -166,6 +124,71 @@ GET /org  过滤组织
 返回数据:[
 			{org}
 			]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			----------------------------------------------------------------------
+			1、前端接口
+	1.1 获取用户签到点
+		GET /location
+		参数param
+			?ticket&latitude&longitude
+		Header ticket
+		返回body
+			{oId, place, signIn,signOut,id ,distance}
+	1.2 创建签到记录
+		注释：place:外出签到是地点，正常签到是签到点
+		POST /record
+		参数body
+			{place,result,note,shift,latitude,longitude,photo}
+		Header ticket
+		返回body
+			{id,place,time,result,note,shift,latitude,longitude,photo}
+	1.3 修改签到记录
+		PUT	/record/{id}
+		参数body
+			{note,photo}
+		Header ticket
+		返回body
+			{id,place,time,result,note,shift,latitude,longitude,photo}
+	1.4 按天获取签到记录结果
+		GET /record
+		参数param
+			?ticket&time
+		Header ticket
+		返回body
+			{place,time,result,shift,id}
+	1.5 获取签到记录详情
+		GET /record/{id}
+		Header ticket
+		返回body
+			{place,time,result,shift,id,latitude,longitude,note,photo,eId}
+	1.5 获取签到记录结果
+		GET /record/stats
+		Header ticket
+		参数param
+			?begin&end
+		返回body
+			{date,result}
+	
             +
 
 

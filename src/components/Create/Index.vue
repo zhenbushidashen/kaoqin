@@ -5,11 +5,11 @@
 <label for="">考勤部门</label> 
  <el-input
   placeholder="请输入内容"
-  v-model="input10"
+  v-model="place"
   clearable
   style="width:50%;">
 </el-input>
-<el-button type="primary" icon="el-icon-edit" circle @click=""></el-button>
+<el-button type="primary" icon="el-icon-edit" circle @click="contactTableVisible=true"></el-button>
   <br>
   <br>
 
@@ -17,7 +17,7 @@
 
 <el-input
   placeholder="请输入内容"
-  v-model="input10"
+  v-model="place"
   clearable
   style="width:50%;">
 </el-input>
@@ -25,47 +25,101 @@
 
   <br>
   <br>
+ <el-time-picker
+    v-model="signIn"
+    placeholder="请选择上班时间">
+  </el-time-picker>
   <el-time-picker
-    is-range
-    v-model="value4"
-    range-separator="至"
-    start-placeholder="开始时间"
-    end-placeholder="结束时间"
-    placeholder="选择时间范围">
+    arrow-control
+    v-model="signOut"
+    placeholder="请选择下班时间">
   </el-time-picker>
    <br>
   <br>
-    <el-select v-model="value" placeholder="请选择范围">
-    <el-option
-      v-for="item in options"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value">
-    </el-option>
+    <el-select v-model="radius" placeholder="请选择打卡范围" >
+    <el-option label="50米" :value="50"></el-option>
+    <el-option label="100米" :value="100"></el-option>
+    <el-option label="200米" :value="200"></el-option>
+    <el-option label="300米" :value="300"></el-option>
+    <el-option label="500米" :value="500"></el-option>
   </el-select>
   <br>
   <br>
-  <el-button>取消返回</el-button>
+  <el-button @click="$router.push('/')">取消返回</el-button>
   <el-button type="primary">立即创建</el-button>
-  <el-dialog title="请选择办公地点" :visible.sync="dialogTableVisible">
-    <Map></Map>
-    <el-button>取消</el-button>
+  <el-dialog title="选择办公地点" :visible.sync="dialogTableVisible">
+    <BMap></BMap>
+    <el-button @click="dialogTableVisible=false">取消</el-button>
     <el-button type="primary">确定</el-button>
 </el-dialog>
+
+  <el-dialog title="选择考勤部门" :visible.sync="contactTableVisible">
+    <el-tree
+  :data="data2"
+  show-checkbox
+  default-expand-all
+  node-key="id"
+  ref="tree"
+  highlight-current
+  :props="defaultProps">
+</el-tree>
+    <el-button @click="contactTableVisible=false">取消</el-button>
+    <el-button type="primary">确定</el-button>
+</el-dialog>
+<!-- {{new Date(signIn).getHours()+':'+ new Date(signIn).getMinutes()+':'+new Date(signIn).getSeconds()}}
+{{new Date(signOut).getHours()+':'+ new Date(signOut).getMinutes()+':'+new Date(signIn).getSeconds()}} -->
   </div>
 </template>
 
 <script>
-import Map from '../Map'
+import BMap from '../BMap'
 export default {
   components: {
-    Map
+    BMap
   },
   data() {
       return {
-          value7: '',
-          value4: [new Date(2016, 9, 10, 8, 40), new Date(2016, 9, 10, 9, 40)],
-          dialogTableVisible: false
+          place: '',
+          signIn: '',
+          signOut: '',
+          dialogTableVisible: false,
+          contactTableVisible: false,
+          radius: '',
+          data2: [{
+          id: 1,
+          label: '一级 1',
+          children: [{
+            id: 4,
+            label: '二级 1-1',
+            children: [{
+              id: 9,
+              label: '三级 1-1-1'
+            }, {
+              id: 10,
+              label: '三级 1-1-2'
+            }]
+          }]
+        }, {
+          id: 2,
+          label: '一级 2',
+          children: [{
+            id: 5,
+            label: '二级 2-1'
+          }, {
+            id: 6,
+            label: '二级 2-2'
+          }]
+        }, {
+          id: 3,
+          label: '一级 3',
+          children: [{
+            id: 7,
+            label: '二级 3-1'
+          }, {
+            id: 8,
+            label: '二级 3-2'
+          }]
+        }]
       }
   }
 }

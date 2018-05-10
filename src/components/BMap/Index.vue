@@ -5,6 +5,7 @@
 
 <script>
 import BMap from 'BMap'
+import store from '../../store'
 export default {
   name: 'map',
   mounted() {

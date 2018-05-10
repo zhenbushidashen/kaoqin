@@ -7,11 +7,13 @@ import ElmentUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElmentUI)
 Vue.config.productionTip = false
+import store from './store'
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

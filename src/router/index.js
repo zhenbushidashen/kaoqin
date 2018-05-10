@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Entry from '@/components/Entry'
 import Create from '@/components/Create'
 import DataView from '@/components/DataView'
-
 Vue.use(Router)
 
 export default new Router({
@@ -11,8 +10,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'Entry',
+      component: Entry
     },
     {
       path: '/create',
@@ -20,14 +19,14 @@ export default new Router({
       component: Create
     },
     { 
-      path: '/dataview',
+      path: '/dataview/:locationId',
       name: 'DataView',
       component: DataView
     },
     {
       
       path: '/modify',
-      name: 'Create',
+      name: 'modify',
       component: Create
     }
   ]
