@@ -4,10 +4,11 @@
   <br>
 <label for="">考勤部门</label> 
  <el-input
-  placeholder="请输入内容"
+  placeholder="点击右侧选择考勤组织"
   v-model="organization.oName"
   clearable
-  style="width:50%;">
+  style="width:50%;"
+  :disabled="true">
 </el-input>
 <el-button type="primary" icon="el-icon-edit" circle @click="contactTableVisible=true"></el-button>
   <br>
@@ -16,9 +17,10 @@
 <label for="">办公地址</label>
 
 <el-input
-  placeholder="请输入内容"
+  placeholder="点击右侧选择办公地址"
   v-model="place"
   clearable
+  :disabled="true"
   style="width:50%;">
 </el-input>
 <el-button type="primary" icon="el-icon-edit" circle @click="dialogTableVisible = true"></el-button>
@@ -55,8 +57,10 @@
 
   <el-dialog title="选择考勤部门" :visible.sync="contactTableVisible">
     <el-tree
-  :data="data2"
+  :data="orgInfo"
   show-checkbox
+  @check="selectNode"
+  :check-on-click-node="true"
   default-expand-all
   node-key="id"
   ref="tree"
@@ -64,7 +68,7 @@
   >
 </el-tree>
     <el-button @click="contactTableVisible=false">取消</el-button>
-    <el-button type="primary">确定</el-button>
+    <el-button type="primary" @click="confirmSelectOrg">确定</el-button>
 </el-dialog>
 <!-- {{new Date(signIn).getHours()+':'+ new Date(signIn).getMinutes()+':'+new Date(signIn).getSeconds()}}
 {{new Date(signOut).getHours()+':'+ new Date(signOut).getMinutes()+':'+new Date(signIn).getSeconds()}} -->
@@ -73,20 +77,34 @@
 
 <script>
 import BMap from '../BMap'
+import http from '../../utils/request'
 export default {
   components: {
     BMap
   },
+  created() {
+    http.request({
+      method: 'get',
+      baseURL: 'http://183.196.130.125:9002/contact',
+      url:'/org?pId=10000000'
+    }).then(res => {
+       this.orgInfo = res.data.map((val, idx) => {
+          return {id: val.oId, label: val.oName, isLeaf: val.isLeaf}
+       })
+    })
+  },
   data() {
       return {
+          i: 0,
           place: '',
           signIn: '',
           signOut: '',
           dialogTableVisible: false,
           contactTableVisible: false,
           radius: '',
+          currentSelectOrg: {},
           organization: {oName: '新奥', oId: '10000000'},
-          data2: [{
+          orgInfo: [{
           id: 1,
           label: '一级 1',
           children: [{
@@ -141,8 +159,28 @@ export default {
         this.$message.error('请选择打卡范围')
         return 
       }
-
+    },
+    selectNode (data, checked, node) {
+      if(this.i%2==0){
+        if(checked){
+         this.$refs.tree.setCheckedNodes([]);
+        this.$refs.tree.setCheckedNodes([data]);
+                    //交叉点击节点
+         }else{
+           this.$refs.tree.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+      }
     }
+    this.currentSelectOrg = {oId: data.id, oName: data.label}
+  },
+  confirmSelectOrg () {
+    if(!this.currentSelectOrg.oId) {
+      this.$message.error('您还未选择组织')
+    } else{ 
+    this.organization = this.currentSelectOrg
+    this.contactTableVisible = false
+    }
+  }
   }
 }
 </script>
