@@ -5,7 +5,7 @@
 <label for="">考勤部门</label> 
  <el-input
   placeholder="请输入内容"
-  v-model="oName"
+  v-model="organization.oName"
   clearable
   style="width:50%;">
 </el-input>
@@ -85,6 +85,7 @@ export default {
           dialogTableVisible: false,
           contactTableVisible: false,
           radius: '',
+          organization: {oName: '新奥', oId: '10000000'},
           data2: [{
           id: 1,
           label: '一级 1',

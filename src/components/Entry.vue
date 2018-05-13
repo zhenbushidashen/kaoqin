@@ -76,10 +76,19 @@ export default {
           cancelButtonText: '取消',
           type: 'warning',
         }).then(() => {
-          this.$message({
+          store.dispatch('DELETE_ATTENDANCEITEM', row.scope.locationId)
+          .then(res => {
+            this.$message({
             type: 'success',
             message: '删除成功!'
+          }, err =>{
+            this.$message({
+            type: 'error',
+            message: err
           })
+          })
+          })
+      
         }).catch(() => {
           this.$message({
             type: 'info',
