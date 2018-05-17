@@ -50,7 +50,14 @@
   <el-button @click="$router.push('/')">取消返回</el-button>
   <el-button type="primary" @click="confirmChange">立即创建</el-button>
   <el-dialog title="选择办公地点" :visible.sync="dialogTableVisible">
-    <BMap></BMap>
+    <!-- <BMap></BMap> -->
+     <div class="amap-page-container">
+      <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
+      <el-amap vid="amapDemo" :center="mapCenter" :zoom="12" class="amap-demo" :plugin="plugin">
+        <el-amap-marker v-for="marker in markers" :position="marker" ></el-amap-marker>
+      </el-amap>
+    </div>
+    {{lng}} {{lat}}
     <el-button @click="dialogTableVisible=false">取消</el-button>
     <el-button type="primary">确定</el-button>
 </el-dialog>
@@ -76,12 +83,12 @@
 </template>
 
 <script>
-import BMap from '../BMap'
+// import BMap from '../BMap'
 import http from '../../utils/request'
 export default {
-  components: {
-    BMap
-  },
+  // components: {
+  //   BMap
+  // },
   created() {
     http.request({
       method: 'get',
@@ -94,8 +101,11 @@ export default {
     })
   },
   data() {
+    let self = this
       return {
           i: 0,
+          lng: 0,
+          lat: 0, 
           place: '',
           signIn: '',
           signOut: '',
@@ -104,41 +114,29 @@ export default {
           radius: '',
           currentSelectOrg: {},
           organization: {oName: '新奥', oId: '10000000'},
-          orgInfo: [{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
-            }]
+          orgInfo: [],
+          markers: [],
+          searchOption: {
+            city: '',
+            citylimit: true
+          },
+          mapCenter: [121.59996, 31.197646],
+           plugin: [{
+            pName: 'Geolocation',
+            events: {
+              init: function (o) {
+                // o 是高德地图定位插件实例
+                o.getCurrentPosition((status, result) => {
+                  if (result && result.position) {
+                    self.lng = result.position.lng;
+                    self.lat = result.position.lat;
+                    self.mapCenter = [self.lng, self.lat];
+                    self.$nextTick();
+                  }
+                });
+              }
+            }
           }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2'
-          }]
-        }]
       }
   },
   methods: {
@@ -180,11 +178,45 @@ export default {
     this.organization = this.currentSelectOrg
     this.contactTableVisible = false
     }
-  }
+  },
+  addMarker: function() {
+          let lng = 121.5 + Math.round(Math.random() * 1000) / 10000;
+          let lat = 31.197646 + Math.round(Math.random() * 500) / 10000;
+          this.markers.push([lng, lat]);
+        },
+        onSearchResult(pois) {
+          let latSum = 0;
+          let lngSum = 0;
+          if (pois.length > 0) {
+            pois.forEach(poi => {
+              let {lng, lat} = poi;
+              lngSum += lng;
+              latSum += lat;
+              this.markers.push([poi.lng, poi.lat]);
+            });
+            let center = {
+              lng: lngSum / pois.length,
+              lat: latSum / pois.length
+            };
+            this.mapCenter = [center.lng, center.lat];
+          }
+        }
   }
 }
 </script>
 
-<style>
+<style scoped>
+   .amap-demo {
+      height: 400px;
+    }
 
+    .search-box {
+      position: absolute;
+      top: 25px;
+      left: 20px;
+    }
+
+    .amap-page-container {
+      position: relative;
+    }
 </style>

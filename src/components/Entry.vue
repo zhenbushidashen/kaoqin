@@ -33,7 +33,7 @@
       label="状态"
      >
       <template slot-scope="scope">
-        <span>{{scope.row.status ? '禁用' : '启用'}}</span>
+        <span>{{scope.row.status ? '启用' : '禁用'}}</span>
 
       </template>
     </el-table-column>
