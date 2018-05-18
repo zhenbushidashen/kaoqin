@@ -16,7 +16,7 @@
   </el-select>
   <el-button type="primary">查询</el-button>
   <el-button type="primary">导出EXCEL</el-button>
-  </div>
+  </div>  
   <div>
     <el-table
     :data="tableData"

@@ -123,18 +123,23 @@ export default {
           mapCenter: [121.59996, 31.197646],
            plugin: [{
             pName: 'Geolocation',
+            
             events: {
-              init: function (o) {
-                // o 是高德地图定位插件实例
-                o.getCurrentPosition((status, result) => {
-                  if (result && result.position) {
-                    self.lng = result.position.lng;
-                    self.lat = result.position.lat;
-                    self.mapCenter = [self.lng, self.lat];
-                    self.$nextTick();
-                  }
-                });
-              }
+              // init: function (o) {
+              //   // o 是高德地图定位插件实例
+              //   o.getCurrentPosition((status, result) => {
+              //     if (result && result.position) {
+              //       console.log(result)
+              //       self.lng = result.position.lng;
+              //       self.lat = result.position.lat;
+              //       self.mapCenter = [self.lng, self.lat];
+              //       self.$nextTick();
+              //     }
+              //   });
+              // }
+              'click': (e) => {
+              alert('map clicked');
+            }
             }
           }]
       }
