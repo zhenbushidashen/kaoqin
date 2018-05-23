@@ -1,6 +1,6 @@
 <template>
   <div>
-       <br>
+   <br>
   <br>
 <label for="">考勤部门</label> 
  <el-input
@@ -49,46 +49,57 @@
   <br>
   <el-button @click="$router.push('/')">取消返回</el-button>
   <el-button type="primary" @click="confirmChange">立即创建</el-button>
-  <el-dialog title="选择办公地点" :visible.sync="dialogTableVisible">
-    <!-- <BMap></BMap> -->
-     <div class="amap-page-container">
-      <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
-      <el-amap vid="amapDemo" :center="mapCenter" :zoom="12" class="amap-demo" :plugin="plugin">
-        <el-amap-marker v-for="marker in markers" :position="marker" ></el-amap-marker>
-      </el-amap>
+
+  <el-dialog title="选择办公地点" :visible.sync="dialogTableVisible" width="90%">
+
+    <div class="map-container">
+     <div style="flex:80;">
+      <AMap @select="select"></AMap>        
+     </div>
+    <div style="flex:20;">
+      
+  <el-radio-group v-model="positionChecked">
+    <div v-if="position && position.address" style="margin: 10px 0px 10px 20px;" v-for="(position, index) in positionArray" :key="index">
+    <el-radio  v-if="position && position.address" :label="position"> {{position.name}} &nbsp;({{position.address}}) </el-radio>
+    <br>
+    
     </div>
-    {{lng}} {{lat}}
-    <el-button @click="dialogTableVisible=false">取消</el-button>
-    <el-button type="primary">确定</el-button>
+  </el-radio-group>
+    </div>
+ <div>
+</div>
+</div>
+    <div style="display:flex;justify-content:flex-end; padding-right: 20%;">
+      {{positionChecked}}
+   <el-button @click="dialogTableVisible=false">取消</el-button>
+    <el-button type="primary" @click="confirmSelectAddress" :disabled="!positionChecked.address || !positionChecked.location">确定</el-button>
+    </div>
 </el-dialog>
 
   <el-dialog title="选择考勤部门" :visible.sync="contactTableVisible">
-    <el-tree
-  :data="orgInfo"
-  show-checkbox
-  @check="selectNode"
-  :check-on-click-node="true"
-  default-expand-all
-  node-key="id"
-  ref="tree"
-  highlight-current
-  >
+  <el-tree
+      :data="orgInfo"
+      show-checkbox
+      @check="selectNode"
+      :check-on-click-node="true"
+      default-expand-all
+      node-key="id"
+      ref="tree"
+      highlight-current
+      >
 </el-tree>
     <el-button @click="contactTableVisible=false">取消</el-button>
     <el-button type="primary" @click="confirmSelectOrg">确定</el-button>
 </el-dialog>
-<!-- {{new Date(signIn).getHours()+':'+ new Date(signIn).getMinutes()+':'+new Date(signIn).getSeconds()}}
-{{new Date(signOut).getHours()+':'+ new Date(signOut).getMinutes()+':'+new Date(signIn).getSeconds()}} -->
+
   </div>
 </template>
 
 <script>
-// import BMap from '../BMap'
 import http from '../../utils/request'
+import AMap from '../AMap'
 export default {
-  // components: {
-  //   BMap
-  // },
+
   created() {
     http.request({
       method: 'get',
@@ -116,35 +127,34 @@ export default {
           organization: {oName: '新奥', oId: '10000000'},
           orgInfo: [],
           markers: [],
+          positionArray: [],
           searchOption: {
             city: '',
             citylimit: true
           },
-          mapCenter: [121.59996, 31.197646],
-           plugin: [{
-            pName: 'Geolocation',
-            
-            events: {
-              // init: function (o) {
-              //   // o 是高德地图定位插件实例
-              //   o.getCurrentPosition((status, result) => {
-              //     if (result && result.position) {
-              //       console.log(result)
-              //       self.lng = result.position.lng;
-              //       self.lat = result.position.lat;
-              //       self.mapCenter = [self.lng, self.lat];
-              //       self.$nextTick();
-              //     }
-              //   });
-              // }
-              'click': (e) => {
-              alert('map clicked');
-            }
-            }
-          }]
+          positionChecked: {},
+          mapCenter: [121.59996, 31.197646]
       }
   },
+  components: {
+    AMap
+  },
   methods: {
+    select (source) {
+      const {lat, lng} = source.lnglat
+      const self = this
+      source.placeSearch.searchNearBy("", [lng, lat], 500, function(status, result) {
+    if (status === 'complete' && result.info === 'OK') {
+      
+        self.positionArray = result.poiList.pois
+        console.log(self.positionArray)
+    }
+}) 
+    },
+    confirmSelectAddress () {
+      this.place = `${this.positionChecked.name}(${this.positionChecked.address})`
+      this.dialogTableVisible = false
+    },
     confirmChange() {
       if(!this.$data.place) {
         this.$message.error('请选择办公地点')
@@ -184,6 +194,9 @@ export default {
     this.contactTableVisible = false
     }
   },
+  selectMarker (e) {
+    alert(JSON.stringify(e))
+  },
   addMarker: function() {
           let lng = 121.5 + Math.round(Math.random() * 1000) / 10000;
           let lat = 31.197646 + Math.round(Math.random() * 500) / 10000;
@@ -211,17 +224,9 @@ export default {
 </script>
 
 <style scoped>
-   .amap-demo {
+    .map-container {
+      width: 100%;
       height: 400px;
-    }
-
-    .search-box {
-      position: absolute;
-      top: 25px;
-      left: 20px;
-    }
-
-    .amap-page-container {
-      position: relative;
+      display: flex;
     }
 </style>
