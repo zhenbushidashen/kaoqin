@@ -25,6 +25,7 @@ lazyAMapApiLoaderInstance.load().then(() => {
   });
 })
 /* eslint-disable no-new */
+Vue.filter('timeDouble', val => val < 10 ? `0${val}` : val)
 new Vue({
   el: '#app',
   router,

@@ -25,7 +25,7 @@ export default new Router({
     },
     {
       
-      path: '/modify',
+      path: '/modify/:locationId',
       name: 'modify',
       component: Create
     }

@@ -41,7 +41,7 @@
       label="操作">
       <template slot-scope="scope">
      <router-link :to="{path: `/dataview/${scope.row.locationId}`}">考勤数据</router-link>
-     <router-link to="/modify">修改</router-link>
+     <router-link :to="{path: `/modify/${scope.row.locationId}`}">修改</router-link>
         <a href="javascript:;" @click="enableDisableItem(scope.row.status, scope.row.locationId)">{{scope.row.status ? '禁用' : '启用'}}</a>
         <a href="javascript:;" @click="deleteItem(scope.row.locationId)">删除</a>
       </template>

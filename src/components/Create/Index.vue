@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div style="padding: 30px;background:lightblue; border-radius: 10px;">
    <br>
   <br>
-<label for="">考勤部门</label> 
+<label for="" style="font-weight:bold;">考勤部门: </label> 
  <el-input
   placeholder="点击右侧选择考勤组织"
   v-model="organization.oName"
@@ -14,7 +14,7 @@
   <br>
   <br>
 
-<label for="">办公地址</label>
+<label for="" style="font-weight:bold;">办公地址: </label>
 
 <el-input
   placeholder="点击右侧选择办公地址"
@@ -25,19 +25,34 @@
 </el-input>
 <el-button type="primary" icon="el-icon-edit" circle @click="dialogTableVisible = true"></el-button>
 
-  <br>
-  <br>
- <el-time-picker
+  <br/>
+  <br/>
+  <label for="" style="font-weight:bold;">上班时间: </label>
+ <!-- <el-time-picker
     v-model="signIn"
+    format="HH时mm分"
     placeholder="请选择上班时间">
-  </el-time-picker>
-  <el-time-picker
-    arrow-control
-    v-model="signOut"
-    placeholder="请选择下班时间">
-  </el-time-picker>
+  </el-time-picker> -->
+  <el-select v-model="startHour" placeholder="小时" style="width:80px;" size="mini">
+     <el-option :value="hour" v-for="hour in 24" :key="hour" :label="hour|timeDouble"></el-option>
+  </el-select>时
+    <el-select v-model="startMinute" placeholder="分钟" style="width:80px;" size="mini">
+     <el-option :value="0" label="00"></el-option>      
+     <el-option :value="minute" v-for="minute in 60" :key="minute" :label="minute|timeDouble"></el-option>
+  </el-select>分
+  <br/>
+  <br/>
+  <label for="" style="font-weight:bold;">下班时间: </label>
+  <el-select v-model="endHour" placeholder="小时" style="width:80px;" size="mini">
+     <el-option :value="hour" v-for="hour in 24" :key="hour" :label="hour|timeDouble"></el-option>
+  </el-select>时
+    <el-select v-model="endMinute" placeholder="分钟" style="width:80px;" size="mini">
+      <el-option :value="0" label="00"></el-option>
+     <el-option :value="minute" v-for="minute in 60" :key="minute" :label="minute|timeDouble"></el-option>
+  </el-select>分
    <br>
   <br>
+  <label for="" style="font-weight:bold;">打卡范围: </label>
     <el-select v-model="radius" placeholder="请选择打卡范围" >
     <el-option label="50米" :value="50"></el-option>
     <el-option label="100米" :value="100"></el-option>
@@ -48,7 +63,7 @@
   <br>
   <br>
   <el-button @click="$router.push('/')">取消返回</el-button>
-  <el-button type="primary" @click="confirmChange">立即创建</el-button>
+  <el-button type="primary" @click="confirmCreate">{{$route.name === 'modify' ? '确认修改' : '立即创建'}}</el-button>
 
   <el-dialog title="选择办公地点" :visible.sync="dialogTableVisible" width="90%">
 
@@ -98,9 +113,11 @@
 <script>
 import http from '../../utils/request'
 import AMap from '../AMap'
+import store from '../../store'
 export default {
 
   created() {
+    const self = this
     http.request({
       method: 'get',
       baseURL: 'http://183.196.130.125:9002/contact',
@@ -110,6 +127,17 @@ export default {
           return {id: val.oId, label: val.oName, isLeaf: val.isLeaf}
        })
     })
+   if (this.$route.name === 'modify') {
+     store.dispatch('GET_ATTENDANCEITEM', this.$route.params.locationId).then(res => {
+       self.signIn = res.data.signIn
+       self.signOut = res.data.signOut
+       self.radius = res.data.location.radius
+       self.lng = res.data.location.longitude
+       self.lat = res.data.location.latitude
+       self.place = res.data.place
+       console.log(res)
+     })
+   }
   },
   data() {
     let self = this
@@ -133,7 +161,11 @@ export default {
             citylimit: true
           },
           positionChecked: {},
-          mapCenter: [121.59996, 31.197646]
+          mapCenter: [121.59996, 31.197646],
+          startHour: 9,
+          startMinute: 0,
+          endHour: 18,
+          endMinute: 0,
       }
   },
   components: {
@@ -155,7 +187,8 @@ export default {
       this.place = `${this.positionChecked.name}(${this.positionChecked.address})`
       this.dialogTableVisible = false
     },
-    confirmChange() {
+    confirmCreate() {
+      const self = this
       if(!this.$data.place) {
         this.$message.error('请选择办公地点')
         return 
@@ -171,7 +204,24 @@ export default {
        if(!this.$data.radius) {
         this.$message.error('请选择打卡范围')
         return 
-      }
+      }      
+      store.dispatch('CREATE_LOCATION', {
+        place: this.place,
+        latitude: this.lat,
+        longitude: this.lng,
+        radius: this.radius
+      }).then(res => {
+        store.dispatch('CREATE_RULE', {
+          oId: self.organization.oId,
+          locationId: res.data.id,
+          signIn: self.signIn,
+          signOut: self.signOut
+        }).then(res => {
+          console.log(res)
+          self.$router.push('/')
+        })
+      })
+
     },
     selectNode (data, checked, node) {
       if(this.i%2==0){

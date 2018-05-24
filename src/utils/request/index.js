@@ -16,9 +16,13 @@ service.interceptors.request.use(config => {
 })
 
 service.interceptors.response.use(response => {
-  if (response.status === 200) {
-    return response
-  }
+   if(response.status === 200 || response.status === 201 || response.status === 304){
+     return response
+   } else {
+    return Promise.reject(response.message)
+   }
+}, error => {
+  return Promise.reject(error)
 })
 
 export default service
