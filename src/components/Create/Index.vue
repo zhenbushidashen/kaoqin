@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 30px;background:gold; border-radius: 10px;">
+  <div style="padding: 30px;border: 1px solid rgba(103,194,58,.4); border-radius: 10px;box-shadow: 1px 2px 1px 1px #999;">
    <br>
   <br>
 <label for="" style="font-weight:bold;">考勤部门: </label> 

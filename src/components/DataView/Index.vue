@@ -8,14 +8,14 @@
       align="right"
       start-placeholder="上班时间"
       end-placeholder="下班时间"
-      :default-time="['12:00:00', '08:00:00']">
+      :default-time="['12:00:00', '08:00:00']" size="mini">
     </el-date-picker>
-    <el-select v-model="signType" placeholder="请选择">
+    <el-select v-model="signType" placeholder="请选择" size="mini">
     <el-option value="1"></el-option>
     <el-option value="2"></el-option>
   </el-select>
-  <el-button type="primary" @click="query">查询</el-button>
-  <el-button type="primary" @click="expor">导出EXCEL</el-button>
+  <el-button type="primary" @click="query" size="mini">查询</el-button>
+  <el-button type="primary" @click="expor" size="mini">导出EXCEL</el-button>
   </div>  
   <div>
     <el-table

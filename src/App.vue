@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view/>
+    <transition enter-active-class="animated rollIn" leave-active-class="animated rollOut">
+       <router-view/>      
+    </transition>
   </div>
 </template>
 
@@ -11,4 +13,10 @@ export default {
 </script>
 
 <style>
+a {
+  text-decoration: none;
+}
+a:hover {
+  color: black;
+}
 </style>

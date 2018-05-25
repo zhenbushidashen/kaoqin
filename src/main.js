@@ -7,6 +7,7 @@ import ElmentUI from 'element-ui'
 import VueAMap from 'vue-amap'
 import { lazyAMapApiLoaderInstance } from 'vue-amap'
 import 'element-ui/lib/theme-chalk/index.css'
+import './assets/animate.css'
 Vue.use(ElmentUI)
 Vue.use(VueAMap)
 Vue.config.productionTip = false

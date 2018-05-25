@@ -1,7 +1,11 @@
 <template>
   <div class="hello">
-   <el-button type="primary" @click="create">添加考勤</el-button>
-    <el-table
+   <el-button type="primary" @click="create" style="width:100%;margin: 10px 0px;font-size:18px;">
+     <i class="el-icon-circle-plus-outline"></i>
+     添加考勤</el-button>
+   <div style="border: 1px solid rgba(103,194,58,.2); border-radius:4px;">
+     <el-tag type="success" style="width:100%;text-align:center;border-bottom:none;font-size:16px;">考勤规则管理</el-tag>
+          <el-table
     :data="$store.state.attendanceItems"
     style="width: 100%"
     :default-sort = "{prop: 'date', order: 'descending'}"
@@ -47,7 +51,8 @@
       </template>
     </el-table-column>
   </el-table>
-  {{$store.state.attendanceItems}}
+   </div>
+
   </div>
 </template>
 
