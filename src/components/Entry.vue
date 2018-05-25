@@ -41,8 +41,8 @@
       label="操作">
       <template slot-scope="scope">
      <router-link :to="{path: `/dataview/${scope.row.locationId}`}">考勤数据</router-link>
-     <router-link :to="{path: `/modify/${scope.row.locationId}`}">修改</router-link>
-        <a href="javascript:;" @click="enableDisableItem(scope.row.status, scope.row.locationId)">{{scope.row.status ? '禁用' : '启用'}}</a>
+     <router-link :to="{path: `/modify/${scope.row.ruleId}`}">修改</router-link>
+        <a href="javascript:;" @click="enableDisableItem(scope.row.status, scope.row.ruleId)">{{scope.row.status ? '禁用' : '启用'}}</a>
         <a href="javascript:;" @click="deleteItem(scope.row.locationId)">删除</a>
       </template>
     </el-table-column>
@@ -70,13 +70,13 @@ export default {
       create () {
         this.$router.push('/create')
       },
-      deleteItem(row) {
+      deleteItem(locationId) {
         this.$confirm('确定删除此条考勤规则?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
         }).then(() => {
-          store.dispatch('DELETE_ATTENDANCEITEM', row.scope.locationId)
+          store.dispatch('DELETE_ATTENDANCEITEM', locationId)
           .then(res => {
             this.$message({
             type: 'success',
@@ -89,11 +89,6 @@ export default {
           })
           })
       
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
         })
       },
       enableDisableItem (status, id) {

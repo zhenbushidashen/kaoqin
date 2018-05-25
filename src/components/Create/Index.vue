@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 30px;background:lightblue; border-radius: 10px;">
+  <div style="padding: 30px;background:gold; border-radius: 10px;">
    <br>
   <br>
 <label for="" style="font-weight:bold;">考勤部门: </label> 
@@ -38,7 +38,7 @@
   </el-select>时
     <el-select v-model="startMinute" placeholder="分钟" style="width:80px;" size="mini">
      <el-option :value="0" label="00"></el-option>      
-     <el-option :value="minute" v-for="minute in 60" :key="minute" :label="minute|timeDouble"></el-option>
+     <el-option :value="minute" v-for="minute in 59" :key="minute" :label="minute|timeDouble"></el-option>
   </el-select>分
   <br/>
   <br/>
@@ -48,7 +48,7 @@
   </el-select>时
     <el-select v-model="endMinute" placeholder="分钟" style="width:80px;" size="mini">
       <el-option :value="0" label="00"></el-option>
-     <el-option :value="minute" v-for="minute in 60" :key="minute" :label="minute|timeDouble"></el-option>
+     <el-option :value="minute" v-for="minute in 59" :key="minute" :label="minute|timeDouble"></el-option>
   </el-select>分
    <br>
   <br>
@@ -128,14 +128,15 @@ export default {
        })
     })
    if (this.$route.name === 'modify') {
-     store.dispatch('GET_ATTENDANCEITEM', this.$route.params.locationId).then(res => {
-       self.signIn = res.data.signIn
-       self.signOut = res.data.signOut
+     store.dispatch('GET_ATTENDANCEITEM', this.$route.params.ruleId).then(res => {
        self.radius = res.data.location.radius
        self.lng = res.data.location.longitude
        self.lat = res.data.location.latitude
        self.place = res.data.place
-       console.log(res)
+       self.startHour = +res.data.signIn.split(':')[0]
+       self.startMinute = +res.data.signIn.split(':')[1]
+       self.endHour = +res.data.signOut.split(':')[0]
+       self.endMinute = +res.data.signOut.split(':')[1]
      })
    }
   },
@@ -146,8 +147,6 @@ export default {
           lng: 0,
           lat: 0, 
           place: '',
-          signIn: '',
-          signOut: '',
           dialogTableVisible: false,
           contactTableVisible: false,
           radius: '',
@@ -193,11 +192,11 @@ export default {
         this.$message.error('请选择办公地点')
         return 
       }
-      if(!this.$data.signIn) {
+      if(!this.signIn) {
         this.$message.error('请选择上班时间')
         return 
       }
-      if(!this.$data.signOut) {
+      if(!this.signOut) {
         this.$message.error('请选择下班时间')
         return 
       }
@@ -210,27 +209,31 @@ export default {
         latitude: this.lat,
         longitude: this.lng,
         radius: this.radius
-      }).then(res => {
+      },err => {
+          this.$message.success(err + '请联系技术人员')
+        }).then(res => {
         store.dispatch('CREATE_RULE', {
           oId: self.organization.oId,
           locationId: res.data.id,
           signIn: self.signIn,
           signOut: self.signOut
         }).then(res => {
-          console.log(res)
+          this.$message.success('创建考勤成功')
           self.$router.push('/')
+        }, err => {
+          this.$message.success(err + '请联系技术人员')
         })
       })
 
     },
     selectNode (data, checked, node) {
-      if(this.i%2==0){
-        if(checked){
-         this.$refs.tree.setCheckedNodes([]);
-        this.$refs.tree.setCheckedNodes([data]);
+      if (this.i % 2 === 0) {
+        if (checked) {
+         this.$refs.tree.setCheckedNodes([])
+         this.$refs.tree.setCheckedNodes([data])
                     //交叉点击节点
-         }else{
-           this.$refs.tree.setCheckedNodes([]);
+         } else {
+           this.$refs.tree.setCheckedNodes([])
             //点击已经选中的节点，置空
       }
     }
@@ -269,6 +272,14 @@ export default {
             this.mapCenter = [center.lng, center.lat];
           }
         }
+  },
+  computed: {
+    signIn () {
+      return (this.startHour > 10 ? this.startHour : '0' + this.startHour) + ':' + (this.startMinute > 10 ? this.startMinute : '0' + this.startMinute) + ':00'
+    },
+    signOut () {
+      return (this.endHour > 10 ? this.endHour : '0' + this.endHour) + ':' + (this.endMinute > 10 ? this.endMinute : '0' + this.endMinute) + ':00'
+    }
   }
 }
 </script>
