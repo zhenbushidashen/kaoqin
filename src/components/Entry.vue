@@ -37,20 +37,26 @@
       label="状态"
      >
       <template slot-scope="scope">
-        <span>{{scope.row.status ? '启用' : '禁用'}}</span>
+        <el-tag v-if="scope.row.status" class="el-icon-success"> 启用</el-tag>
+        <el-tag v-if="!scope.row.status" type="danger" class="el-icon-remove"> 禁用</el-tag>
 
       </template>
     </el-table-column>
     <el-table-column
       label="操作">
       <template slot-scope="scope">
-     <router-link :to="{path: `/dataview/${scope.row.locationId}`}">考勤数据</router-link>
+     <router-link :to="{path: `/dataview/${scope.row.ruleId}`}">考勤数据</router-link>
      <router-link :to="{path: `/modify/${scope.row.ruleId}`}">修改</router-link>
         <a href="javascript:;" @click="enableDisableItem(scope.row.status, scope.row.ruleId)">{{scope.row.status ? '禁用' : '启用'}}</a>
-        <a href="javascript:;" @click="deleteItem(scope.row.locationId)">删除</a>
       </template>
     </el-table-column>
   </el-table>
+  <div style="display:flex;justify-content:flex-end;padding-right:15%;">
+     <el-pagination
+    layout="prev, pager, next, jumper"
+    :total="$store.state.attendanceItems.length">
+  </el-pagination>
+  </div>
    </div>
 
   </div>
@@ -99,12 +105,12 @@ export default {
       enableDisableItem (status, id) {
         if(status) {
           store.dispatch('CLOSE_ATTENDANCEITEM',id).then(res => {
-            store.commit('UPDATE_ATTENDANCEITEM', {locationId: id, key: 'status', value: false})
+            store.commit('UPDATE_ATTENDANCEITEM', {ruleId: id, key: 'status', value: false})
             this.$message.success('禁用成功')
           })
         } else {
           store.dispatch('OPEN_ATTENDANCEITEM', id).then(res => {
-            store.commit('UPDATE_ATTENDANCEITEM', {locationId: id, key: 'status', value: true})
+            store.commit('UPDATE_ATTENDANCEITEM', {ruleId: id, key: 'status', value: true})
             this.$message.success('开启成功')
           })
         }

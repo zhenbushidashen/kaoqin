@@ -19,7 +19,7 @@ export default new Router({
       component: Create
     },
     { 
-      path: '/dataview/:locationId',
+      path: '/dataview/:ruleId',
       name: 'DataView',
       component: DataView
     },

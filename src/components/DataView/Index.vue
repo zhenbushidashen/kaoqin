@@ -4,25 +4,26 @@
           打卡时间：  
     <el-date-picker
       v-model="value7"
-      type="datetimerange"
+      type="daterange"
       align="right"
-      start-placeholder="上班时间"
-      end-placeholder="下班时间"
-      :default-time="['12:00:00', '08:00:00']" size="mini">
+      unlink-panels
+      range-separator="至"
+      start-placeholder="开始日期"
+      end-placeholder="结束日期"
+      :picker-options="pickerOptions">
     </el-date-picker>
+
     <el-select v-model="signType" placeholder="请选择" size="mini">
-    <el-option value="1"></el-option>
-    <el-option value="2"></el-option>
+    <el-option :value="1" label="上下班"></el-option>
+    <el-option :value="2" label="外出"></el-option>
   </el-select>
   <el-button type="primary" @click="query" size="mini">查询</el-button>
-  <el-button type="primary" @click="expor" size="mini">导出EXCEL</el-button>
+  <el-button type="primary" @click="exportExcel" size="mini">导出EXCEL</el-button>
   </div>  
   <div>
     <el-table
-    :data="tableData"
     style="width: 100%">
 
-    </el-table-column>
     <el-table-column
       prop="eName"
       label="姓名"
@@ -43,40 +44,50 @@
       label="组织"
       :formatter="formatter">
     </el-table-column>
-    </el-table-column>
   </el-table>
+   <el-button type="info" style="width: 100%;" @click="$router.push('/')">返回首页</el-button>
   </div>
   
   </div>
 </template>
 
 <script>
+import {exportAttendanceExcel, searchAttendanceData} from '../../api'
 export default {
    data() {
       return {
-        signType: 1
-        // value4: [new Date(2016, 9, 10, 8, 40), new Date(2016, 9, 10, 9, 40)],
-        //  tableData: [{
-        //   date: '2016-05-02',
-        //   name: '王小虎',
-        //   address: '上海市普陀区金沙江路 1518 弄',
-        //   tag: '家'
-        // }, {
-        //   date: '2016-05-04',
-        //   name: '王小虎',
-        //   address: '上海市普陀区金沙江路 1517 弄',
-        //   tag: '公司'
-        // }, {
-        //   date: '2016-05-01',
-        //   name: '王小虎',
-        //   address: '上海市普陀区金沙江路 1519 弄',
-        //   tag: '家'
-        // }, {
-        //   date: '2016-05-03',
-        //   name: '王小虎',
-        //   address: '上海市普陀区金沙江路 1516 弄',
-        //   tag: '公司'
-        // }]
+        signType: 1,
+        tableData: [],
+        value7: [],
+        info: {},
+        pickerOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
+        
       }
     },
      methods: {
@@ -91,11 +102,37 @@ export default {
         return row[property] === value;
       },
       query () {
-
+        if (!this.value7.length) {
+          this.$message.error('请选择查询范围!')
+          return
+        }
+        if (!this.signType) {
+          this.$message.error('请选择打卡类型!')
+          return
+        }
+        const self = this
+        const params = {oId: this.info.oId, locationId: this.info.locationId, startDate: this.value7[0].toJSON().slice(0,10), endDate: this.value7[1].toJSON().slice(0,10), signType: this.signType}
+        console.log(params)
+        searchAttendanceData(params).then(res => {
+          self.tableData = res.data
+        }, err => {
+          this.$message.error(err)
+        })
       },
-      export () {
-
+      exportExcel () {
+        exportAttendanceExcel({oId: this.info.oId})  
       }
+    },
+    created () {
+      const self = this
+      this.$store.dispatch('GET_ATTENDANCEITEM', this.$route.params.ruleId).then(res => {
+        self.info = res.data
+     })
+    },
+    computed: {
+      // startDate () {
+      //   return this.value7[0] && this.value7[0].slice(8)
+      // }
     }
 }
 </script>
