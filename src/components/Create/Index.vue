@@ -5,10 +5,10 @@
 <label for="" style="font-weight:bold;">考勤部门: </label> 
  <el-input
   placeholder="点击右侧选择考勤组织"
-  v-model="organization.oName"
+  v-model="organization[0].oName"
   clearable
   style="width:50%;"
-  :disabled="true">
+  :disabled="true" size="mini">
 </el-input>
 <el-button type="primary" icon="el-icon-edit" circle @click="contactTableVisible=true"></el-button>
   <br>
@@ -21,7 +21,7 @@
   v-model="place"
   clearable
   :disabled="true"
-  style="width:50%;">
+  style="width:50%;" size="mini">
 </el-input>
 <el-button type="primary" icon="el-icon-edit" circle @click="dialogTableVisible = true"></el-button>
 
@@ -53,15 +53,17 @@
    <br>
   <br>
   <label for="" style="font-weight:bold;">打卡范围: </label>
-    <el-select v-model="radius" placeholder="请选择打卡范围" >
+    <el-select v-model="radius" placeholder="请选择打卡范围" size="mini">
     <el-option label="50米" :value="50"></el-option>
     <el-option label="100米" :value="100"></el-option>
     <el-option label="200米" :value="200"></el-option>
     <el-option label="300米" :value="300"></el-option>
     <el-option label="500米" :value="500"></el-option>
+    <el-option label="1000米" :value="1000"></el-option>
   </el-select>
   <br>
   <br>
+  {{JSON.stringify(organization)}}
   <el-button @click="$router.push('/')">取消返回</el-button>
   <el-button type="primary" @click="confirmCreate">{{$route.name === 'modify' ? '确认修改' : '立即创建'}}</el-button>
 
@@ -92,17 +94,28 @@
 </el-dialog>
 
   <el-dialog title="选择考勤部门" :visible.sync="contactTableVisible">
-  <el-tree
+  <!-- <el-tree
       :data="orgInfo"
       show-checkbox
       @check="selectNode"
       :check-on-click-node="true"
-      default-expand-all
       node-key="id"
       ref="tree"
       highlight-current
       >
-</el-tree>
+</el-tree> -->
+  <el-tree
+    :data="organization"
+    node-key="oId"
+    @check="selectNode"
+    :props="customProps"
+    :default-expanded-keys="[10000000]"
+    :check-strictly="true"
+    :load="loadNode"
+    ref="tree"
+    :show-checkbox="true"
+    lazy>
+  </el-tree>
     <el-button @click="contactTableVisible=false">取消</el-button>
     <el-button type="primary" @click="confirmSelectOrg">确定</el-button>
 </el-dialog>
@@ -111,20 +124,17 @@
 </template>
 
 <script>
-import http from '../../utils/request'
 import AMap from '../AMap'
 import store from '../../store'
+import {getOriganationInfo} from '../../api'
 export default {
 
   created() {
     const self = this
-    http.request({
-      method: 'get',
-      baseURL: 'http://183.196.130.125:9002/contact',
-      url:'/org?pId=10000000'
-    }).then(res => {
+    getOriganationInfo({oId:this.organization.oId}).then(res => {
+      
        this.orgInfo = res.data.map((val, idx) => {
-          return {id: val.oId, label: val.oName, isLeaf: val.isLeaf}
+          return {id: val.oId, label: val.oName, isLeaf: !!val.isLeaf, children: [{id: '123', label: '哈哈', isLeaf: false}]}
        })
     })
    if (this.$route.name === 'modify') {
@@ -151,7 +161,7 @@ export default {
           contactTableVisible: false,
           radius: '',
           currentSelectOrg: {},
-          organization: {oName: '新奥', oId: '10000000'},
+          organization: [{oName: '新奥', oId: '10000000'}],
           orgInfo: [],
           markers: [],
           positionArray: [],
@@ -165,6 +175,11 @@ export default {
           startMinute: 0,
           endHour: 18,
           endMinute: 0,
+          customProps: {
+            label: 'oName',
+            children: 'zones',
+            isLeaf: 'leaf'
+          }
       }
   },
   components: {
@@ -176,9 +191,7 @@ export default {
       const self = this
       source.placeSearch.searchNearBy("", [lng, lat], 500, function(status, result) {
     if (status === 'complete' && result.info === 'OK') {
-      
         self.positionArray = result.poiList.pois
-        console.log(self.positionArray)
     }
 }) 
     },
@@ -213,7 +226,7 @@ export default {
           this.$message.success(err + '请联系技术人员')
         }).then(res => {
         store.dispatch('CREATE_RULE', {
-          oId: self.organization.oId,
+          oId: self.organization[0].oId,
           locationId: res.data.id,
           signIn: self.signIn,
           signOut: self.signOut
@@ -231,19 +244,17 @@ export default {
         if (checked) {
          this.$refs.tree.setCheckedNodes([])
          this.$refs.tree.setCheckedNodes([data])
-                    //交叉点击节点
          } else {
            this.$refs.tree.setCheckedNodes([])
-            //点击已经选中的节点，置空
       }
     }
-    this.currentSelectOrg = {oId: data.id, oName: data.label}
+    this.currentSelectOrg = {oId: data.oId, oName: data.oName}
   },
   confirmSelectOrg () {
     if(!this.currentSelectOrg.oId) {
       this.$message.error('您还未选择组织')
     } else{ 
-    this.organization = this.currentSelectOrg
+    this.organization = [this.currentSelectOrg]
     this.contactTableVisible = false
     }
   },
@@ -271,7 +282,22 @@ export default {
             };
             this.mapCenter = [center.lng, center.lat];
           }
+        },
+      loadNode(node, resolve) {
+        console.log(node)
+        const vue = this
+        if (node.level === 0) {
+          return resolve([{ oName: '新奥集团', oId: '10000000', disabled: false }])
         }
+        setTimeout(() => {
+          getOriganationInfo({oId:node.key}).then(res => {
+            const result = res.data.map((val, idx) => {
+              return {oName: val.oName, oId: val.oId, leaf: !!val.isLeaf}
+            })
+            resolve(result)
+          })
+        }, 500)
+      },
   },
   computed: {
     signIn () {

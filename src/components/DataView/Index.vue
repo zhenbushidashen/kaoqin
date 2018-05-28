@@ -1,26 +1,27 @@
 <template>
   <div>
-     <div>
-          打卡时间：  
-    <el-date-picker
-      v-model="value7"
-      type="daterange"
-      align="right"
-      unlink-panels
-      range-separator="至"
-      start-placeholder="开始日期"
-      end-placeholder="结束日期"
-      :picker-options="pickerOptions">
-    </el-date-picker>
+      <div>
+            打卡时间：  
+      <el-date-picker
+        v-model="value7"
+        type="daterange"
+        align="right"
+        unlink-panels
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :picker-options="pickerOptions"
+        size="mini">
+      </el-date-picker>
 
-    <el-select v-model="signType" placeholder="请选择" size="mini">
-    <el-option :value="1" label="上下班"></el-option>
-    <el-option :value="2" label="外出"></el-option>
-  </el-select>
-  <el-button type="primary" @click="query" size="mini">查询</el-button>
-  <el-button type="primary" @click="exportExcel" size="mini">导出EXCEL</el-button>
-  </div>  
-  <div>
+      <el-select v-model="signType" placeholder="请选择" size="mini">
+        <el-option :value="1" label="上下班"></el-option>
+        <el-option :value="2" label="外出"></el-option>
+      </el-select>
+      <el-button type="primary" @click="query" size="mini">查询</el-button>
+      <el-button type="primary" @click="exportExcel" size="mini">导出EXCEL</el-button>
+    </div>  
+   <div>
     <el-table
     style="width: 100%">
 
@@ -103,11 +104,23 @@ export default {
       },
       query () {
         if (!this.value7.length) {
-          this.$message.error('请选择查询范围!')
+          this.$notify({
+            type: 'warning',
+            title: '提示',
+            message: '请选择查询范围!',
+            duration: 2000,
+            position: 'top-right'
+          })
           return
         }
         if (!this.signType) {
-          this.$message.error('请选择打卡类型!')
+            this.$notify({
+            type: 'warning',
+            title: '提示',
+            message: '请选择打卡类型!',
+            duration: 2000,
+            position: 'top-right'
+          })
           return
         }
         const self = this

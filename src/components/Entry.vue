@@ -6,7 +6,7 @@
    <div style="border: 1px solid rgba(103,194,58,.2); border-radius:4px;">
      <el-tag type="success" style="width:100%;text-align:center;border-bottom:none;font-size:16px;">考勤规则管理</el-tag>
           <el-table
-    :data="$store.state.attendanceItems"
+    :data="currentAttendanceItems"
     style="width: 100%"
     :default-sort = "{prop: 'date', order: 'descending'}"
     >
@@ -54,7 +54,9 @@
   <div style="display:flex;justify-content:flex-end;padding-right:15%;">
      <el-pagination
     layout="prev, pager, next, jumper"
-    :total="$store.state.attendanceItems.length">
+    :total="$store.state.attendanceItems.length"
+    :page-size="5"
+    @current-change="changePage">
   </el-pagination>
   </div>
    </div>
@@ -75,6 +77,7 @@ export default {
   },
   data() {
       return {
+        page: 0
       } 
     },
     methods: {
@@ -114,7 +117,16 @@ export default {
             this.$message.success('开启成功')
           })
         }
+      },
+      changePage(page) {
+        this.page = page - 1
       }
+  },
+  computed: {
+    currentAttendanceItems() {
+      const computedPageNumber = this.page * 5
+      return store.state.attendanceItems.slice(computedPageNumber,  computedPageNumber + 5 >= store.state.attendanceItems.length ? store.state.attendanceItems.length : computedPageNumber + 5)
+    }
   }
 }
 </script>

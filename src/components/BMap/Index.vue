@@ -32,7 +32,7 @@ export default {
 		,"location" : map
 	});
 
-	ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+	ac.addEventListener("onhighlight", function(e) {  
 	var str = "";
 		var _value = e.fromitem.value;
 		var value = "";
@@ -51,7 +51,7 @@ export default {
 	});
 
 	var myValue;
-	ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+	ac.addEventListener("onconfirm", function(e) {   
 	var _value = e.item.value;
 		myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
 		G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
@@ -60,13 +60,13 @@ export default {
 	});
 
 	function setPlace(){
-		map.clearOverlays();    //清除地图上所有覆盖物
+		map.clearOverlays();   
 		function myFun(){
-			var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+			var pp = local.getResults().getPoi(0).point;   
 			map.centerAndZoom(pp, 18);
-			map.addOverlay(new BMap.Marker(pp));    //添加标注
+			map.addOverlay(new BMap.Marker(pp));  
 		}
-		var local = new BMap.LocalSearch(map, { //智能搜索
+		var local = new BMap.LocalSearch(map, { 
 		  onSearchComplete: myFun
 		});
 		local.search(myValue);

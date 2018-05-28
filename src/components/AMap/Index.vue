@@ -13,9 +13,6 @@
       data: function() {
         return {
           markers: [
-            [121.59996, 31.197646],
-            [121.40018, 31.197622],
-            [121.69991, 31.207649]
           ],
           searchOption: {
             city: '',
@@ -25,6 +22,10 @@
           giveExample: {
               'init': function (o) {
                   this.placeSearch= new AMap.PlaceSearch() 
+              }.bind(this),
+              'click': function (source) {
+               source.placeSearch = this.placeSearch
+               this.$emit('select', source)
               }.bind(this)
           },
           events: {
