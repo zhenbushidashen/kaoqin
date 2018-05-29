@@ -1,5 +1,6 @@
 <template>
-  <div style="padding: 30px;border: 1px solid rgba(103,194,58,.4); border-radius: 10px;box-shadow: 1px 2px 1px 1px #999;">
+  <div style="padding: 30px;border: 1px solid rgba(103,194,58,.4); border-radius: 10px;box-shadow: 1px 2px 1px 1px #999;" v-loading="loading"
+    element-loading-text="加载中...">
    <br>
   <br>
 <label for="" style="font-weight:bold;">考勤部门: </label> 
@@ -35,21 +36,21 @@
   </el-time-picker> -->
   <el-select v-model="startHour" placeholder="小时" style="width:80px;" size="mini">
      <el-option :value="hour" v-for="hour in 24" :key="hour" :label="hour|timeDouble"></el-option>
-  </el-select>时
+  </el-select> 时
     <el-select v-model="startMinute" placeholder="分钟" style="width:80px;" size="mini">
      <el-option :value="0" label="00"></el-option>      
      <el-option :value="minute" v-for="minute in 59" :key="minute" :label="minute|timeDouble"></el-option>
-  </el-select>分
+  </el-select> 分
   <br/>
   <br/>
   <label for="" style="font-weight:bold;">下班时间: </label>
   <el-select v-model="endHour" placeholder="小时" style="width:80px;" size="mini">
      <el-option :value="hour" v-for="hour in 24" :key="hour" :label="hour|timeDouble"></el-option>
-  </el-select>时
+  </el-select> 时
     <el-select v-model="endMinute" placeholder="分钟" style="width:80px;" size="mini">
       <el-option :value="0" label="00"></el-option>
      <el-option :value="minute" v-for="minute in 59" :key="minute" :label="minute|timeDouble"></el-option>
-  </el-select>分
+  </el-select> 分
    <br>
   <br>
   <label for="" style="font-weight:bold;">打卡范围: </label>
@@ -64,7 +65,7 @@
   <br>
   <br>
   {{JSON.stringify(organization)}}
-  <el-button @click="$router.push('/')">取消返回</el-button>
+  <el-button @click="$router.go(-1)">取消返回</el-button>
   <el-button type="primary" @click="confirmCreate">{{$route.name === 'modify' ? '确认修改' : '立即创建'}}</el-button>
 
   <el-dialog title="选择办公地点" :visible.sync="dialogTableVisible" width="90%">
@@ -138,6 +139,7 @@ export default {
        })
     })
    if (this.$route.name === 'modify') {
+     this.loading = true
      store.dispatch('GET_ATTENDANCEITEM', this.$route.params.ruleId).then(res => {
        self.radius = res.data.location.radius
        self.lng = res.data.location.longitude
@@ -147,6 +149,7 @@ export default {
        self.startMinute = +res.data.signIn.split(':')[1]
        self.endHour = +res.data.signOut.split(':')[0]
        self.endMinute = +res.data.signOut.split(':')[1]
+       this.loading = false
      })
    }
   },
@@ -179,7 +182,8 @@ export default {
             label: 'oName',
             children: 'zones',
             isLeaf: 'leaf'
-          }
+          },
+          loading: false
       }
   },
   components: {

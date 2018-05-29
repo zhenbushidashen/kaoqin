@@ -1,17 +1,21 @@
 import axios from 'axios'
 import * as api from '../../config/server'
+import {getToken} from '../../auth'
 
 
 const service = axios.create({
   baseURL: api.attendanceApi,
   timeout: 15000
 })
-
+var tokenInfo = getToken(window.location.href)
 service.interceptors.request.use(config => {
-  config.headers = {
-    'Content-Type': 'application/json;charset=UTF-8',
-    'token': '7213dba014dbb106a3e27b76a11aced4'
-  }
+  if(tokenInfo.success){
+    console.log(tokenInfo)
+    config.headers = {
+      'Content-Type': 'application/json;charset=UTF-8',
+      'token': tokenInfo.token
+    } 
+  } 
  return config
 })
 

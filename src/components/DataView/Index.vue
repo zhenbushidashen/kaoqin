@@ -46,7 +46,7 @@
       :formatter="formatter">
     </el-table-column>
   </el-table>
-   <el-button type="info" style="width: 100%;" @click="$router.push('/')">返回首页</el-button>
+   <el-button type="info" style="width: 100%;" @click="$router.go(-1)" class="el-icon-back"> 返回首页</el-button>
   </div>
   
   </div>
